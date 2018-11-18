@@ -25,6 +25,15 @@ test_cases = {1:[[[2.16135,-1.42635,1.55109],
               4:[],
               5:[]}
 
+def TF_Matrix(q, d, a, alpha):
+    TF = Matrix(
+    [[cos(q),   -sin(q),    0,  a],
+    [ sin(q)*cos(alpha), cos(q)*cos(alpha), -sin(alpha), -sin(alpha)*d],
+    [ sin(q)*sin(alpha), cos(q)*sin(alpha),  cos(alpha),  cos(alpha)*d],
+    [0, 0,  0,  1]])
+    return TF
+
+
 
 def test_code(test_case):
     ## Set up code
@@ -63,13 +72,128 @@ def test_code(test_case):
     ## 
 
     ## Insert IK code here!
+    ### Your FK code here
+    # Create symbols
+    # Joint angle (variable for revolute)
+    q1, q2, q3, q4, q5, q6, q7 = symbols('q1:8')
+    # Link offset (variable for prismatic)
+    d1, d2, d3, d4, d5, d6, d7 = symbols('d1:8')
+    # Link length
+    a0, a1, a2, a3, a4, a5, a6 = symbols('a0:7')
+    # Twist angles
+    alpha0,alpha1, alpha2, alpha3, alpha4, alpha5, alpha6 = symbols('alpha0:7')    
     
-    theta1 = 0
-    theta2 = 0
-    theta3 = 0
-    theta4 = 0
-    theta5 = 0
-    theta6 = 0
+    
+
+    # Create Modified DH parameters
+    DH = {alpha0: 0,      a0: 0,      d1: 0.75,   q1: q1,
+         alpha1: -pi/2,  a1: 0.35,   d2: 0,       q2: q2-pi/2,
+         alpha2: 0,      a2: 1.25,   d3: 0,       q3: q3,
+         alpha3: -pi/2,  a3: 0.0536, d4: 1.5014,  q4: q4,
+         alpha4: pi/2,   a4: 0,      d5: 0,       q5: q5,
+         alpha5: -pi/2,  a5: 0,      d6: 0,       q6: q6,
+         alpha6: 0,      a6: 0,      d7: 0.303,   q7: 0}
+    
+    
+    # Create individual transformation matrices
+    T0_1 = TF_Matrix(q1, d1, a0, alpha0).subs(DH)
+    T1_2 = TF_Matrix(q2, d2, a1, alpha1).subs(DH)
+    T2_3 = TF_Matrix(q3, d3, a2, alpha2).subs(DH)
+    T3_4 = TF_Matrix(q4, d4, a3, alpha3).subs(DH)
+    T4_5 = TF_Matrix(q5, d5, a4, alpha4).subs(DH)
+    T5_6 = TF_Matrix(q6, d6, a5, alpha5).subs(DH)
+    T6_G = TF_Matrix(q7, d7, a6, alpha6).subs(DH)
+    
+    
+       # Extract rotation matrices from the transformation matrices
+       # transform
+    T0_ee = T0_1 * T1_2 * T2_3 * T3_4 * T4_5 * T5_6 * T6_G
+    
+     
+
+    # Extract end-effector position and orientation from request
+    # px,py,pz = end-effector position
+    # roll, pitch, yaw = end-effector orientation
+    px = req.poses[x].position.x
+    py = req.poses[x].position.y
+    pz = req.poses[x].position.z
+
+    #(roll, pitch, yaw) = tf.transformations.euler_from_quaternion(
+     #   [req.poses[x].orientation.x, req.poses[x].orientation.y,
+      #  req.poses[x].orientation.z, req.poses[x].orientation.w])
+
+    (roll, pitch, yaw) = tf.transformations.euler_from_quaternion(
+        [req.poses[x].orientation.x, req.poses[x].orientation.y,
+         req.poses[x].orientation.z, req.poses[x].orientation.w])
+
+    r = Symbol('r')
+    rot_x = Matrix([[1, 0, 0],
+            [0, cos(r), -sin(r)],
+            [0, sin(r), cos(r)]])
+
+    p = Symbol('p')
+    rot_y = Matrix([[cos(p), 0, sin(p)],
+            [0, 1, 0],
+            [-sin(p), 0, cos(p)]])
+
+    y = Symbol('y')
+    rot_z = Matrix([[cos(y), -sin(y), 0],
+            [sin(y), cos(y), 0],
+            [0, 0, 1]])
+
+    rot_ee = rot_x * rot_y * rot_z
+
+
+     ### Your IK code here
+    # Compensate for rotation discrepancy between DH parameters and Gazebo
+    rot_discrep = rot_z.subs(y, radians(180)) * rot_y.subs(p, radians(-90))
+    rot_ee = rot_ee * rot_discrep
+
+    rot_ee = rot_ee.subs({'r': roll, 'p': pitch, 'y': yaw})
+           
+    # End effector position matrix
+    ee = Matrix([[px],[pz], [pz]])
+
+    # calculate the center of the wrist
+    wrist_center = ee - (0.303) * rot_ee[:,2]
+
+
+           ############ Calculate joint angles using Geometric IK method##################
+           
+       
+    a_side = 1.501
+    c_side = 1.25
+    b_side = sqrt( 
+                (   (sqrt(wrist_center[0]**2 + wrist_center[1]**2) - 0.35) **2  ) \
+                + ( (wrist_center[2] - 0.75)**2) )
+
+     
+    a_angle = acos((b_side**2 + c_side**2 - a_side**2) / (2 * b_side * c_side))
+
+    b_angle = acors((a_side**2 + c_side**2 - b_side**2) / (2 * a_side * c_side))
+
+    c_angle = acos((a_side**2 + b_side**2 - c_side**2) / (2 * a_side * b_side))
+           
+
+    theta1 = atan2(wrist_center[1], wrist_center[0])
+
+    theta2 = pi/2 - a_angle - atan2(wrist_center[2] - 0.750, sqrt(wrist_center[0]**2 + wrist_center**2) - 0.350)
+           
+    theta3 = pi/2 - (b_angle + 0.0360)
+           
+    #individual transformation matrices used
+    R0_3 = T0_1[0:3,0:3] * T1_2[0:3,0:3] * T2_3[0:3,0:3]
+    R0_3 = R0_3.evalf(subs = {q1: theta1, q2: theta2, q3: theta3}) 
+
+    R3_6 = R0_3.T * rot_ee
+
+    #Euler angles from Rot Matrix  ## The last step
+    theta4 = atan2(R3_6[2,2], -R3_6[0,2])
+           
+    theta5 = atan2(sqrt(R3_6[0,2]**2 + R3_6[2,2]**2), R3_6[1,2])
+           
+    theta6 = atan2(-R3_6[1,1], R3_6[1,0])
+
 
     ## 
     ########################################################################################
@@ -79,6 +203,7 @@ def test_code(test_case):
     ## as the input and output the position of your end effector as your_ee = [x,y,z]
 
     ## (OPTIONAL) YOUR CODE HERE!
+    FK= (T0_ee).evalf(subs={q1: theta1, q2: theta2, q3: theta3, q4: theta4, q5: theta5, q6: theta6})
 
     ## End your code input for forward kinematics here!
     ########################################################################################
