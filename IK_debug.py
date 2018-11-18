@@ -170,14 +170,14 @@ def test_code(test_case):
      
     a_angle = acos((b_side**2 + c_side**2 - a_side**2) / (2 * b_side * c_side))
 
-    b_angle = acors((a_side**2 + c_side**2 - b_side**2) / (2 * a_side * c_side))
+    b_angle = acos((a_side**2 + c_side**2 - b_side**2) / (2 * a_side * c_side))
 
     c_angle = acos((a_side**2 + b_side**2 - c_side**2) / (2 * a_side * b_side))
            
 
     theta1 = atan2(wrist_center[1], wrist_center[0])
 
-    theta2 = pi/2 - a_angle - atan2(wrist_center[2] - 0.750, sqrt(wrist_center[0]**2 + wrist_center**2) - 0.350)
+    theta2 = pi/2 - a_angle - atan2(wrist_center[2] - 0.750, sqrt(wrist_center[0]**2 + wrist_center[1]**2) - 0.350)
            
     theta3 = pi/2 - (b_angle + 0.0360)
            
@@ -209,8 +209,8 @@ def test_code(test_case):
     ########################################################################################
 
     ## For error analysis please set the following variables of your WC location and EE location in the format of [x,y,z]
-    your_wc = [wrist_center1[0],wrist_center1[1],wrist_center1[2]] # <--- Load your calculated WC values in this array
-    your_ee = [FK[0, 3], FK[1,3] FK[2,3]] # <--- Load your calculated end effector value from your forward kinematics
+    your_wc = [wrist_center[0],wrist_center[1],wrist_center[2]] # <--- Load your calculated WC values in this array
+    your_ee = [FK[0, 3], FK[1,3], FK[2,3]] # <--- Load your calculated end effector value from your forward kinematics
     ########################################################################################
 
     ## Error analysis
