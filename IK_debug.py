@@ -70,7 +70,7 @@ def test_code(test_case):
     
     ########################################################################################
     ## 
-
+    #https://github.com/VinoVino/RoboND-Kinematics-Project.git
     ## Insert IK code here!
     ### Your FK code here
     # Create symbols
@@ -209,8 +209,8 @@ def test_code(test_case):
     ########################################################################################
 
     ## For error analysis please set the following variables of your WC location and EE location in the format of [x,y,z]
-    your_wc = [1,1,1] # <--- Load your calculated WC values in this array
-    your_ee = [1,1,1] # <--- Load your calculated end effector value from your forward kinematics
+    your_wc = [wrist_center1[0],wrist_center1[1],wrist_center1[2]] # <--- Load your calculated WC values in this array
+    your_ee = [FK[0, 3], FK[1,3] FK[2,3]] # <--- Load your calculated end effector value from your forward kinematics
     ########################################################################################
 
     ## Error analysis
