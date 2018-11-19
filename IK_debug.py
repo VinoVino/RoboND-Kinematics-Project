@@ -163,10 +163,15 @@ def test_code(test_case):
        
     a_side = 1.501
     c_side = 1.25
-    b_side = sqrt( 
-                (  pow((sqrt(wrist_center[0]**2 + wrist_center[1]**2) - 0.35), 2)   
-                + ( (wrist_center[2] - 0.75)**2) )
+    side_b_xy=sqrt(WC[0]*WC[0]+WC[1]*WC[1])-0.35 
+    side_b_z=WC[2]-0.75
+    #b_side = sqrt( 
+     #           (pow((sqrt(wrist_center[0]**2 + wrist_center[1]**2) - 0.35), 2)   
+     #           + ( (wrist_center[2] - 0.75)**2) )
      
+
+    b_side = sqrt(pow((side_b_xy),2) + pow((side_b_z), 2))
+
     a_angle = acos((b_side**2 + c_side**2 - a_side**2) / (2 * b_side * c_side))
 
     b_angle = acos((a_side**2 + c_side**2 - b_side**2) / (2 * a_side * c_side))
