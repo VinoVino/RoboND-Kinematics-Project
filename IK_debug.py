@@ -28,8 +28,8 @@ test_cases = {1:[[[2.16135,-1.42635,1.55109],
 def TF_Matrix(q, d, a, alpha):
     TF = Matrix(
     [[cos(q),   -sin(q),    0,  a],
-    [ sin(q)*cos(alpha), cos(q)*cos(alpha), -sin(alpha), -sin(alpha)*d],
-    [ sin(q)*sin(alpha), cos(q)*sin(alpha),  cos(alpha),  cos(alpha)*d],
+    [sin(q)*cos(alpha), cos(q)*cos(alpha), -sin(alpha), -sin(alpha)*d],
+    [sin(q)*sin(alpha), cos(q)*sin(alpha), cos(alpha),  cos(alpha)*d],
     [0, 0,  0,  1]])
     return TF
 
@@ -87,27 +87,27 @@ def test_code(test_case):
 
     # Create Modified DH parameters
     DH = {alpha0: 0,      a0: 0,      d1: 0.75,   q1: q1,
-         alpha1: -pi/2,  a1: 0.35,   d2: 0,       q2: q2-pi/2,
+         alpha1: -pi/2.0,  a1: 0.35,   d2: 0,       q2: -pi/2.0 + q2,
          alpha2: 0,      a2: 1.25,   d3: 0,       q3: q3,
-         alpha3: -pi/2,  a3: 0.0536, d4: 1.5014,  q4: q4,
-         alpha4: pi/2,   a4: 0,      d5: 0,       q5: q5,
-         alpha5: -pi/2,  a5: 0,      d6: 0,       q6: q6,
+         alpha3: -pi/2.0,  a3: -0.054, d4: 1.50,  q4: q4,
+         alpha4: pi/2.0,   a4: 0,      d5: 0,       q5: q5,
+         alpha5: -pi/2.0,  a5: 0,      d6: 0,       q6: q6,
          alpha6: 0,      a6: 0,      d7: 0.303,   q7: 0}
     
     
     # Create individual transformation matrices
-    T0_1 = TF_Matrix(q1, d1, a0, alpha0).subs(DH)
-    T1_2 = TF_Matrix(q2, d2, a1, alpha1).subs(DH)
-    T2_3 = TF_Matrix(q3, d3, a2, alpha2).subs(DH)
-    T3_4 = TF_Matrix(q4, d4, a3, alpha3).subs(DH)
-    T4_5 = TF_Matrix(q5, d5, a4, alpha4).subs(DH)
-    T5_6 = TF_Matrix(q6, d6, a5, alpha5).subs(DH)
-    T6_G = TF_Matrix(q7, d7, a6, alpha6).subs(DH)
+    T0_1 = TF_Matrix(alpha0, a0, d1, q1).subs(DH)
+    T1_2 = TF_Matrix(alpha1, a1, d2, q2).subs(DH)
+    T2_3 = TF_Matrix(alpha2, a2, d3, q3).subs(DH)
+    T3_4 = TF_Matrix(alpha3, a3, d4, q4).subs(DH)
+    T4_5 = TF_Matrix(alpha4, a4, d5, q5).subs(DH)
+    T5_6 = TF_Matrix(alpha5, a5, d6, q6).subs(DH)
+    T6_ee = TF_Matrix(alpha6, a6, d7, q7).subs(DH)
     
     
        # Extract rotation matrices from the transformation matrices
        # transform
-    T0_ee = T0_1 * T1_2 * T2_3 * T3_4 * T4_5 * T5_6 * T6_G
+    T0_ee = T0_1 * T1_2 * T2_3 * T3_4 * T4_5 * T5_6 * T6_ee
     
      
 
@@ -164,9 +164,8 @@ def test_code(test_case):
     a_side = 1.501
     c_side = 1.25
     b_side = sqrt( 
-                (   (sqrt(wrist_center[0]**2 + wrist_center[1]**2) - 0.35) **2  ) \
+                (  pow((sqrt(wrist_center[0]**2 + wrist_center[1]**2) - 0.35), 2)   
                 + ( (wrist_center[2] - 0.75)**2) )
-
      
     a_angle = acos((b_side**2 + c_side**2 - a_side**2) / (2 * b_side * c_side))
 
