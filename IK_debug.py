@@ -27,12 +27,11 @@ test_cases = {1:[[[2.16135,-1.42635,1.55109],
 
 def TF_Matrix(alpha, a, d, q):
     TF = Matrix(
-    [[cos(q),   -sin(q),    0,  a],
+    [[cos(q),   -sin(q),    0.0,  a],
     [sin(q)*cos(alpha), cos(q)*cos(alpha), -sin(alpha), -sin(alpha)*d],
     [sin(q)*sin(alpha), cos(q)*sin(alpha), cos(alpha),  cos(alpha)*d],
-    [0, 0,  0,  1]])
+    [0.0, 0.0,  0.0,  1.0]])
     return TF
-
 
 
 def test_code(test_case):
@@ -81,12 +80,12 @@ def test_code(test_case):
     # Link length
     a0, a1, a2, a3, a4, a5, a6 = symbols('a0:7')
     # Twist angles
-    alpha0,alpha1, alpha2, alpha3, alpha4, alpha5, alpha6 = symbols('alpha0:7')    
+    alpha0, alpha1, alpha2, alpha3, alpha4, alpha5, alpha6 = symbols('alpha0:7')    
     
 
     # Create Modified DH parameters
     DH = {alpha0: 0,       a0: 0,      d1: 0.75,    q1: q1,
-         alpha1: -pi/2.0,  a1: 0.35,   d2: 0,       q2: q2-pi/2.0,
+         alpha1: -pi/2.0,  a1: 0.35,   d2: 0,       q2: -pi/2.0 + q2,
          alpha2: 0,        a2: 1.25,   d3: 0,       q3: q3,
          alpha3: -pi/2.0,  a3: -0.054, d4: 1.50,    q4: q4,
          alpha4: pi/2.0,   a4: 0,      d5: 0,       q5: q5,
@@ -159,24 +158,25 @@ def test_code(test_case):
            ############ Calculate joint angles using Geometric IK method################## 
     a_side = 1.501
     c_side = 1.25
-    b_side_xy = sqrt(wrist_center[0]*wrist_center[0] + wrist_center[1]*wrist_center[1])-0.35 
+    b_side_xy = sqrt(wrist_center[0]**2 + wrist_center[1]**2) -0.35  
     b_side_z = wrist_center[2]-0.75
-    # b_side = sqrt( 
-    #            ((sqrt(wrist_center[0]**2 + wrist_center[1]**2) - 0.35)**2)   
-    #            + ( (wrist_center[2] - 0.75)**2) )
-    b_side = sqrt(b_side_xy**2 + b_side_z**2)
+    
+    #b_side = sqrt(pow((sqrt(wrist_center[0]**2 + wrist_center[1]**2)-0.35),2) + pow((wrist_center[2]-0.75),2))
+    b_side = sqrt(pow(b_side_xy,2) + pow(b_side_z,2))
+    
+    a_angle = acos(( b_side**2 + c_side**2 - a_side**2 ) / (2.0 * b_side * c_side))
 
-    a_angle = acos((b_side**2 + c_side**2 - a_side**2) / (2.0 * b_side * c_side))
+    b_angle = acos(( a_side**2 + c_side**2 - b_side**2 ) / (2.0 * a_side * c_side))
 
-    b_angle = acos((a_side**2 + c_side**2 - b_side**2) / (2.0 * a_side * c_side))
-
-    c_angle = acos((a_side**2 + b_side**2 - c_side**2) / (2.0 * a_side * b_side))
+    c_angle = acos(( a_side**2 + b_side**2 - c_side**2 ) / (2.0 * a_side * b_side))
            
     theta1 = atan2(wrist_center[1], wrist_center[0])
 
     #theta2 = pi/2.0 - a_angle - atan2(wrist_center[2] - 0.750, sqrt(wrist_center[0]**2 + wrist_center[1]**2) - 0.350)
-    theta2 = pi/2.0 - a_angle - atan2(b_side_z, b_side_xy) 
-    theta3 = pi/2.0 - b_angle + 0.0360
+    #theta2 = pi/2.0 - a_angle - atan2(b_side_z, sqrt(wrist_center[0]**2 + wrist_center[1]**2 -0.35)) 
+    theta2 = pi/2.0 - a_angle - atan2(b_side_z, b_side_xy)
+
+    theta3 = pi/2.0 - (b_angle + 0.036)
            
     #individual transformation matrices used
     R0_3 = T0_1[0:3,0:3] * T1_2[0:3,0:3] * T2_3[0:3,0:3]
@@ -188,7 +188,7 @@ def test_code(test_case):
     #Euler angles from Rot Matrix  ## The last step
     theta4 = atan2(R3_6[2,2], -R3_6[0,2])
            
-    theta5 = atan2( sqrt(R3_6[0,2]**2 + R3_6[2,2]**2 ), R3_6[1,2] )
+    theta5 = atan2( sqrt(R3_6[0,2]**2 + R3_6[2,2]**2), R3_6[1,2] )
            
     theta6 = atan2(-R3_6[1,1], R3_6[1,0])
     ########################################################################################
