@@ -112,10 +112,7 @@ def test_code(test_case):
     py = req.poses[x].position.y
     pz = req.poses[x].position.z
 
-    #(roll, pitch, yaw) = tf.transformations.euler_from_quaternion(
-     #   [req.poses[x].orientation.x, req.poses[x].orientation.y,
-      #  req.poses[x].orientation.z, req.poses[x].orientation.w])
-
+ 
     (roll, pitch, yaw) = tf.transformations.euler_from_quaternion(
         [req.poses[x].orientation.x, req.poses[x].orientation.y,
          req.poses[x].orientation.z, req.poses[x].orientation.w])
