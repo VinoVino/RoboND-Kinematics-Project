@@ -57,6 +57,7 @@ def handle_calculate_IK(req):
          alpha6: 0,        a6: 0,      d7: 0.303,   q7: 0}
         # Define Modified DH Transformation matrix
          # Create individual transformation matrices
+        
         T0_1 = TF_Matrix(alpha0,  a0, d1, q1).subs(DH)
         T1_2 = TF_Matrix(alpha1,  a1, d2, q2).subs(DH)
         T2_3 = TF_Matrix(alpha2,  a2, d3, q3).subs(DH)
@@ -64,12 +65,14 @@ def handle_calculate_IK(req):
         T4_5 = TF_Matrix(alpha4,  a4, d5, q5).subs(DH)
         T5_6 = TF_Matrix(alpha5,  a5, d6, q6).subs(DH)
         T6_ee = TF_Matrix(alpha6, a6, d7, q7).subs(DH)
-        # Create individual transformation matrices
+      
     
         # Extract rotation matrices from the transformation matrices
         # transform
         T0_ee = T0_1 * T1_2 * T2_3 * T3_4 * T4_5 * T5_6 * T6_ee
-        ###
+        
+
+
 
         # Initialize service response
         joint_trajectory_list = []
@@ -127,7 +130,6 @@ def handle_calculate_IK(req):
             b_side_xy = sqrt(wrist_center[0]**2 + wrist_center[1]**2) -0.35  
             b_side_z = wrist_center[2]-0.75
             
-            #b_side = sqrt(pow((sqrt(wrist_center[0]**2 + wrist_center[1]**2)-0.35),2) + pow((wrist_center[2]-0.75),2))
             b_side = sqrt(pow(b_side_xy,2) + pow(b_side_z,2))
             
             a_angle = acos(( b_side**2 + c_side**2 - a_side**2 ) / (2.0 * b_side * c_side))
@@ -137,9 +139,7 @@ def handle_calculate_IK(req):
             c_angle = acos(( a_side**2 + b_side**2 - c_side**2 ) / (2.0 * a_side * b_side))
                    
             theta1 = atan2(wrist_center[1], wrist_center[0])
-
-            #theta2 = pi/2.0 - a_angle - atan2(wrist_center[2] - 0.750, sqrt(wrist_center[0]**2 + wrist_center[1]**2) - 0.350)
-            #theta2 = pi/2.0 - a_angle - atan2(b_side_z, sqrt(wrist_center[0]**2 + wrist_center[1]**2 -0.35)) 
+ 
             theta2 = pi/2.0 - a_angle - atan2(b_side_z, b_side_xy)
 
             theta3 = pi/2.0 - (b_angle + 0.036)
