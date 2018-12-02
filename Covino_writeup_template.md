@@ -49,15 +49,15 @@ Note: The solution provided by Udacity was referenced in my solution.  I had tro
 ### 2. Using the DH parameter table you derived earlier, create individual transformation matrices about each joint. In addition, also generate a generalized homogeneous transform between base_link and gripper_link using only end-effector(gripper) pose.
 
 
-### The DH table is stored in a dictionary for quick look up, and used to calculate the individual transfromation matrices.
+#### The DH table is stored in a dictionary for quick look up, and used to calculate the individual transfromation matrices.
 ![DH_Dict_TF_Matrix][image7]
 
 
-###  The TF_Function as shown below.
+####  The TF_Function as shown below.
 ![TFFunction][image8]
 
 
-### The total transforms from base to gripper is calculated by the product of the consecutive transform matrix.
+#### The total transforms from base to gripper is calculated by the product of the consecutive transform matrix.
 ![TotalTransform][image9]
 
 
