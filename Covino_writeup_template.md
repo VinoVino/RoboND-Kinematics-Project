@@ -41,7 +41,7 @@ You're reading it!
 ### Kinematic Analysis
 #### 1. Run the forward_kinematics demo and evaluate the kr210.urdf.xacro file to perform kinematic analysis of Kuka KR210 robot and derive its DH parameters.
 
-Note: The solution provided by Udacity was referenced in my solution.  I had trouble when running the IK.debug.py with offset values around 5 units.  It turned out my calculation of b side was flawed. I used the solution tuturial significantly to debug and correct my errors. 
+Note: The solution provided by Udacity was referenced in my solution.  I had trouble when running the IK.debug.py with offset values around 5 units.  It turned out my calculation of b side was flawed. I used the solution tutorial significantly to debug and correct my errors. 
 
 #### DH Table
 ![DHTable_Table][image6]
@@ -65,7 +65,7 @@ Note: The solution provided by Udacity was referenced in my solution.  I had tro
 
 ![alt text][image5]
 I had trouble with the inverse kinematics and used the Udacity solution video for reference.
-The code below illustrates the solution that provided a very low unit offset and successful completion of the simulator pickup and dropoff.
+The code below illustrates the solution that provided a very low unit offset and successful completion of the simulator pickup and drop-off.
 The side_b presented a major bug in my code.  After correcting my error, the offset was reduced to allow precise placement of the arm.  The Angles of the triangle was solved using the cosine rule.
 
 ![Inverse_Kinematics][image10]
@@ -75,7 +75,7 @@ The side_b presented a major bug in my code.  After correcting my error, the off
 #### 1. Fill in the `IK_server.py` file with properly commented python code for calculating Inverse Kinematics based on previously performed Kinematic Analysis. Your code must guide the robot to successfully complete 8/10 pick and place cycles. Briefly discuss the code you implemented and your results. 
 
 
-The code allowed for successfull completion of 2/2 pick and places.  My virtual environment was extremely slow and cumbersome. I'm thankful for the IK_debug.py script for testing.  The main problem error in my code was the calculation of the bside. I was taking the sqrt (x^2 + y^2 - 0.35) and didn't realize. After resolving the bug with help of the Udacity Tutorial my offset was within spec.
+The code allowed for sucessfull completion of 2/2 pick and places.  My virtual environment was extremely slow and cumbersome. I'm thankful for the IK_debug.py script for testing.  The main problem error in my code was the calculation of the bside. I was taking the sqrt (x^2 + y^2 - 0.35) and didn't realize. After resolving the bug with help of the Udacity Tutorial my offset was within spec.
 
 There are no plans to modify or work on this code further.  I didn't find this project very enjoyable, and would rather focus on improving the RoverSim project.
 
